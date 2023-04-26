@@ -6,6 +6,7 @@ var test12sArr = [];
 var selectedType = 0;
 var limitIndex = 6;
 var numberLimit = 0;
+var isRemove = 1;
 
 $('.scroll-bottom-btn').click(() => {
     window.scrollTo(0, document.body.scrollHeight);
@@ -26,13 +27,13 @@ $('.test2-btn').click(() => {
     $('.button-container .amount>span').text(test12sArr.length);
     $('.show-messi-container').css('display', 'none');
 });
-$('.refresh-btn').click(getPMInfo);
+$('.fuck-btn').click(getPMInfo);
 $('.reset-btn').click(() => {
     resetResult(); 
     selectedType = 0;
     $('#filter-numb-cb').prop('checked', false);
 });
-$('.filter-btn').click(filterOnPMs);
+$('.you-btn').click(filterOnPMs);
 $("#test12-value").change(function(){
     $('.result-container, .filter-result-container').css('display', 'none');
     
@@ -68,6 +69,57 @@ $('input[type="radio"]').on('click', function(e) {
     $('#filter-numb-cb').prop('checked', false);
     $('.filter-result-c__filtered-numb').css('display', 'none');
     filterOnPMs();
+});
+$('.you-btn').click(() => {
+    isRemove++;
+    if(isRemove == 5) {
+        $('.okie-btn').removeClass('d-none');
+    }else if(isRemove == 6) {
+        $('.okie-btn').addClass('d-none');
+        isRemove = 0;
+    }
+});
+$('.okie-btn').click(() => {
+    if($('#filter-numb-cb').is(':checked')) {
+        let _x = $("#any-text").val();
+        let _arr = _x.split(' ').map((e) => Number(e));
+        let _count = 0;
+        let _liHTML = '';
+        test12sArr.forEach((e1, i1) => {
+            e1.forEach((e2, i2) => {
+                let _temp = '';
+                e2.forEach((e3, i3) => {
+                    if(_arr.indexOf(e3) >= 0) {
+                        _count++;
+                        _temp += `<span class='match-numb'>${e3}</span>`;
+                    }else {
+                        _temp += `<span>${e3}</span>`;
+                    }
+                });
+                if(_count == _arr.length) {
+                    _liHTML += "<li>"+_temp+`<span class='match-numb' style='width: auto';> (${i1+1} - ${i2+1})</span> </li>`;
+                }
+                _count = 0;
+                _temp = '';
+            });
+        });
+        $('.filter-result-c__couple-numb .numb-of-result').text((_liHTML.match(/<li>/g) || []).length);
+        $('.filter-result-c__couple-numb .matching-numbs-list').html(_liHTML);
+    } else {
+        const _data = test12sArr.flat().flat();
+        const counts = {};
+        let _html = '';
+
+        for (const num of _data) {
+            counts[num] = counts[num] ? counts[num] + 1 : 1;
+        }
+
+        for (let x in counts) {
+            _html += `<span>${x}-<span class="match-numb">${counts[x]}</span></span>`;
+        }
+        $('.filter-result-c__analysis').html(_html);
+    }
+    
 });
 
 function setHTMLOfAllBS(test12) {
