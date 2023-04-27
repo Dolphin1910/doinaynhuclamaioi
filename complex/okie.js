@@ -286,14 +286,11 @@ function filterOnPMs() {
                                 str += (bs[i]+'')[0];
                             }
                         }
-                    
+                        
                     } else if(type == 2 && bs[0] >= 10 && bs[1] >= 10) {
                         for(let i = 0; i < _limitIndex; i++) {
                             if(bs[i]>=10) {
                                 str += (bs[i]+'')[0];
-                            }else {
-                                str = '';
-                                break;
                             }
                         }
                     }
