@@ -7,6 +7,7 @@ var selectedType = 0;
 var limitIndex = 6;
 var numberLimit = 0;
 var isRemove = 1;
+var setTML = [];
 
 $('.scroll-bottom-btn').click(() => {
     window.scrollTo(0, document.body.scrollHeight);
@@ -70,16 +71,8 @@ $('input[type="radio"]').on('click', function(e) {
     $('.filter-result-c__filtered-numb').css('display', 'none');
     filterOnPMs();
 });
-$('.you-btn').click(() => {
-    isRemove++;
-    if(isRemove == 5) {
-        $('.okie-btn').removeClass('d-none');
-    }else if(isRemove == 6) {
-        $('.okie-btn').addClass('d-none');
-        isRemove = 0;
-    }
-});
 $('.okie-btn').click(() => {
+    
     if($('#filter-numb-cb').is(':checked')) {
         let _x = $("#any-text").val();
         let _arr = _x.split(' ').map((e) => Number(e));
@@ -106,17 +99,23 @@ $('.okie-btn').click(() => {
         $('.filter-result-c__couple-numb .numb-of-result').text((_liHTML.match(/<li>/g) || []).length);
         $('.filter-result-c__couple-numb .matching-numbs-list').html(_liHTML);
     } else {
-        const _data = test12sArr.flat().flat();
-        const counts = {};
+        const _data = Number($('input[name=optradio]:checked').val())>=0 ? setTML.flat() : test12sArr.flat().flat();
+        const _counts = {};
         let _html = '';
+        let _arr = [];
 
         for (const num of _data) {
-            counts[num] = counts[num] ? counts[num] + 1 : 1;
+            _counts[num] = _counts[num] ? _counts[num] + 1 : 1;
         }
 
-        for (let x in counts) {
-            _html += `<span>${x}-<span class="match-numb">${counts[x]}</span></span>`;
+        for (let x in _counts) {
+            _arr.push({numb: x, count: _counts[x]});
         }
+        _arr.sort((a, b) => {
+            return b.count - a.count;
+        }).forEach(e => {
+            _html += `<span>${e.numb}-<span class="match-numb">${e.count}</span></span>`;
+        });
         $('.filter-result-c__analysis').html(_html);
     }
     
@@ -243,6 +242,7 @@ function getPMInfo() {
 }
 
 function filterOnPMs() {
+    setTML = [];
     let test12V =  Number($('#test12-value').val())-1;
     let bsV = Number($('#bs-value').val())-1;
     let filteredNumbIsStr = $("#filtered-numb").val().trim().split('').join('_');
@@ -329,12 +329,19 @@ function filterOnPMs() {
     }
       
     for (let ds of mapA) {
+        let _arr = []
         let newBSsArr = ds[1].bssArr.map((bs) => {
+            let _elem = bs.replaceAll(',', '').split(' ');
+            _arr.push(_elem.filter((e) => !isNaN(e)).map((e) => Number(e)))
             return `<p>${bs}</p>`;
         });
         if(filteredNumbIsStr && ds[0].indexOf(filteredNumbIsStr) >= 0) {
+            setTML.push(..._arr);
             liHTML += `<li> <p>${ds[0]}---<span>${ds[1].numbOfOccurrences}</span>---${ds[1].inPM.trim().split(' ').join('_')}</p> ${newBSsArr.join('')} </li>`;
         } else {
+            if(!filteredNumb) {
+                setTML.push(..._arr);
+            }
             otherLiHTML += `<li> <p>${ds[0]}---<span>${ds[1].numbOfOccurrences}</span>---${ds[1].inPM.trim().split(' ').join('_')}</p> ${newBSsArr.join('')} </li>`;
         };
     }
